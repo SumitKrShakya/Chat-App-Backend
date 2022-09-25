@@ -30,7 +30,7 @@ const server = app.listen(process.env.PORT, () => {
 
 const io = socket(server, {
     cors: {
-        origin: process.env.PORT,
+        origin: 'https://skschat.netlify.app/',
         credentials: true,
     }
 })
