@@ -63,8 +63,33 @@ module.exports.setAvatar = async(req, res, next) => {
 
 module.exports.getAllUsers = async(req, res, next) => {
     try {
-        const users = await User.find({ _id: { $ne: req.params.id } }).select(['email', 'username', 'avatarImage', '_id'])
-        return res.json(users)
+        const currUser = await User.findOne({ _id: req.params.id })
+
+        var list = []
+        await Promise.all(
+            currUser.contacts.map((id) =>
+                User.findById(id).select(['email', 'username', 'avatarImage', '_id']).then((result) => list.unshift(result))
+            )
+        )
+        return res.json(list)
+    } catch (ex) {
+        next(ex)
+    }
+}
+
+module.exports.addContact = async(req, res, next) => {
+    try {
+        const userID = req.body.to
+        const addUser = req.body.add
+        const userData = await User.findByIdAndUpdate(userID, { $push: { contacts: addUser } })
+        const newContacts = await User.findById(userID).select(['contacts'])
+        var list = []
+        await Promise.all(
+            newContacts.contacts.map((id) =>
+                User.findById(id).select(['email', 'username', 'avatarImage', '_id']).then((result) => list.unshift(result))
+            )
+        )
+        return res.json(list)
     } catch (ex) {
         next(ex)
     }

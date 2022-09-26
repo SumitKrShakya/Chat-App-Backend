@@ -13,6 +13,10 @@ const userSchema = new mongoose.Schema({
         required: true,
         max: 50,
     },
+    contacts: {
+        type: Array,
+        required: true,
+    },
     password: {
         type: String,
         required: true,
